@@ -16,33 +16,68 @@ const getAllUsers = async (req, res) => {
     }
 }
 
-const CreateNewUser = (req, res) => {
-    console.log(req.body);
-    res.json({
-        message: 'Create New User Success',
-        data: req.body
-    })
+const CreateNewUser = async (req, res) => {
+    const { body } = req;
+
+    if (!body.email || !body.email || !body.address) {
+        return res.status(400).json({
+            message: "Salah Mengirim Data",
+            data: null
+        })
+    }
+
+    try {
+        await UsersModel.CreateNewUser(body);
+        res.status(201).json({
+            message: 'Create New User Success',
+            data: body
+        })
+    } catch (error) {
+        res.status(500).json({
+            message: 'Server Error',
+            serverMessage: error,
+        });
+    }
+
 }
 
-const UpdateUser = (req, res) => {
+const UpdateUser = async (req, res) => {
     const { id } = req.params;
-    console.log('id:', id);
-    res.json({
-        message: "Update User Success",
-        data: req.body
-    })
+    const { body } = req;
+
+    try {
+        await UsersModel.UpdateUser(body, id);
+        res.json({
+            message: "Update User Success",
+            data: {
+                id: id,
+                ...body
+            }
+        })
+    } catch (error) {
+        res.status(500).json({
+            message: 'Server Error',
+            serverMessage: error,
+        });
+    }
 }
 
-const DeleteUser = (req, res) => {
+const DeleteUser = async (req, res) => {
     const { id } = req.params;
-    res.json({
-        message: 'Delete User Success',
-        data: {
-            id: id,
-            name: "rafi",
-            email: "rafilinta@gmail.com"
-        }
-    })
+
+    try {
+        await UsersModel.DeleteUser(id);
+        res.json({
+            message: 'Delete User Success',
+            data: null
+        })
+    } catch (error) {
+        res.status(500).json({
+            message: 'Server Error',
+            serverMessage: error,
+        });
+    }
+
 }
 
 module.exports = {
